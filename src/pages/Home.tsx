@@ -10,42 +10,44 @@ import TreatmentMenu from '../components/treatments/TreatmentMenu';
 import RitualFinder from '../components/treatments/RitualFinder';
 import { useTreatments } from '../hooks/useTreatments';
 import { BENEFITS, STEPS } from '../data/treatments';
-import { IMG } from '../data/images';
+import { rich } from '../lib/rich';
+import { useSite } from '../context/SiteData';
 import { MSG } from '../lib/whatsapp';
 const ICONS = ['user', 'badge', 'layers', 'home', 'drop', 'heart'];
-const TRUST = ['Atención personalizada', 'Especialista en cosmetología', 'Espacio privado', 'Lunes a sábado · 09:00–18:00'];
 export default function Home() {
   const all = useTreatments();
+  const { img, alt, txt, testimonials } = useSite();
+  const trust = txt('trust_items').split('\n').map((x) => x.trim()).filter(Boolean);
   return (
     <>
       <section className="hero">
         <div className="glow" aria-hidden="true" />
-        <div className="hero-photo"><Img src={IMG.hero} alt="Tratamiento facial en Lumina" /></div>
+        <div className="hero-photo"><Img src={img('hero')} alt={alt('hero')} /></div>
         <p className="hero-side label" aria-hidden="true">Santa Cruz de la Sierra · Bolivia</p>
         <div className="container hero-copy">
-          <p className="label">Atención personalizada por Mariana Vaca</p>
-          <h1>Piel radiante y un cuerpo <em>en armonía.</em></h1>
-          <p className="lead">Tratamientos faciales y corporales personalizados para cuidar tu piel, realzar tu belleza y regalarte un momento de bienestar en Santa Cruz.</p>
+          <p className="label">{txt('hero_label')}</p>
+          <h1>{rich(txt('hero_title'))}</h1>
+          <p className="lead">{txt('hero_lead')}</p>
           <div className="row"><WhatsAppButton label="Agendar mi cita" /><Link className="btn btn-secondary" to="/tratamientos-faciales">Descubrir tratamientos</Link></div>
         </div>
       </section>
-      <div className="strip"><div className="container">{TRUST.map((t) => <span key={t}>{t}</span>)}</div></div>
+      <div className="strip"><div className="container">{trust.map((t) => <span key={t}>{t}</span>)}</div></div>
       <section className="section wm rv">
         <div className="container split">
-          <Img className="photo" src={IMG.reception} alt="Recepción de Lumina Skin & Body Spa" ratio="4/5" />
+          <Img className="photo" src={img('reception')} alt={alt('reception')} ratio="4/5" />
           <div>
             <p className="label">Detrás de Lumina</p>
             <h2>Tu piel merece un cuidado <em>pensado para ti.</em></h2>
-            <p>En Lumina Skin &amp; Body Spa creemos que cada piel y cada cuerpo tienen necesidades diferentes. Por eso, cada experiencia comienza escuchándote, entendiendo tus necesidades y seleccionando un protocolo de cuidado adaptado a ti.</p>
-            <p>Detrás de Lumina está Mariana Vaca, especialista en cosmetología, acompañando personalmente una experiencia donde el cuidado, la atención y el bienestar ocupan el centro.</p>
-            <blockquote className="pull">No vienes simplemente a realizarte un tratamiento. Vienes a regalarte un momento de cuidado personalizado.</blockquote>
+            <p>{txt('home_about_1')}</p>
+            <p>{txt('home_about_2')}</p>
+            <blockquote className="pull">{txt('home_quote')}</blockquote>
             <Link className="btn btn-secondary" to="/sobre-mariana">Conocer a Mariana</Link>
           </div>
         </div>
       </section>
       <section className="section alt rv" id="tratamientos">
         <div className="container">
-          <div className="sec-head"><h2>Tratamientos <em>a tu medida</em></h2><p>Todos parten desde Bs 150. Elige uno para ver el detalle y consultarlo con Mariana por WhatsApp.</p></div>
+          <div className="sec-head"><h2>Tratamientos <em>a tu medida</em></h2><p>Todos parten desde Bs {txt('price_from')}. Elige uno para ver el detalle y consultarlo con Mariana por WhatsApp.</p></div>
           <TreatmentMenu items={all} groups />
         </div>
       </section>
@@ -80,7 +82,13 @@ export default function Home() {
           <div>
             <h2>La experiencia de <em>nuestras clientas</em></h2>
             <p>Cada visita es una oportunidad para hacerte sentir cuidada, escuchada y especial.</p>
-            <p className="pending">[TESTIMONIOS_CLIENTAS_PENDIENTES]</p>
+            {testimonials.length === 0
+              ? <p className="pending">[TESTIMONIOS_CLIENTAS_PENDIENTES]</p>
+              : testimonials.slice(0, 3).map((t) => (
+                <blockquote className="card" key={t.id} style={{ marginBottom: 14 }}>
+                  {t.rating ? <p aria-label={`${t.rating} de 5`}>{'★'.repeat(t.rating)}</p> : null}
+                  <p>{t.testimonial}</p><footer>{t.client_name}</footer>
+                </blockquote>))}
           </div>
           <div><h2>Preguntas <em>frecuentes</em></h2><Faq /></div>
         </div>
