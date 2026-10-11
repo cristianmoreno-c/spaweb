@@ -1,14 +1,8 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import WhatsAppButton from '../components/ui/WhatsAppButton';
 import SectionHeading from '../components/ui/SectionHeading';
-import type { Testimonial } from '../types';
+import { useSite } from '../context/SiteData';
 export default function Testimonials() {
-  const [list, setList] = useState<Testimonial[]>([]);
-  useEffect(() => {
-    supabase?.from('testimonials').select('*').eq('active', true).order('created_at', { ascending: false })
-      .then(({ data }) => setList((data as Testimonial[]) || []));
-  }, []);
+  const { testimonials: list } = useSite();
   return (
     <section className="section container">
       <SectionHeading title="La experiencia de nuestras clientas" text="Cada visita es una oportunidad para hacerte sentir cuidada, escuchada y especial." />
